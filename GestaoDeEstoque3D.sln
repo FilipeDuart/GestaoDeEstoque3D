@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestaoDeEstoque3D", "GestaoDeEstoque3D\GestaoDeEstoque3D.csproj", "{525B343F-6543-42BA-A41E-2A84FCC4C8C5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineContainerPacking", "OnlineContainerPacking\OnlineContainerPacking.csproj", "{6B818553-E094-4BDA-8687-B6E5C5B7441A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{525B343F-6543-42BA-A41E-2A84FCC4C8C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{525B343F-6543-42BA-A41E-2A84FCC4C8C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{525B343F-6543-42BA-A41E-2A84FCC4C8C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{525B343F-6543-42BA-A41E-2A84FCC4C8C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B818553-E094-4BDA-8687-B6E5C5B7441A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B818553-E094-4BDA-8687-B6E5C5B7441A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B818553-E094-4BDA-8687-B6E5C5B7441A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B818553-E094-4BDA-8687-B6E5C5B7441A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {43C1A3EB-374C-44A3-BA02-28C111F53709}
+	EndGlobalSection
+EndGlobal
