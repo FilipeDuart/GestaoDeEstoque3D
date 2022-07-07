@@ -1,0 +1,29 @@
+﻿.toolbar-primeiro-a {
+    border-top-left-radius: 4px !important;
+    border-top-right-radius: 4px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom: 1px solid #ccc !important;
+}
+
+.toolbar-a {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-bottom: 1px solid #ccc !important;
+}
+
+.toolbar-ultimo-a {
+    border-top-left-radius: 0px !important;
+    border-top-right-radius: 0px !important;
+    border-bottom-left-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+    border-bottom: 1px solid #ccc !important;
+}
+
+.control-icon {
+    font-size: 18px;
+    line-height: unset !important;
+    color: #5b5b5b;
+}

@@ -1,0 +1,56 @@
+﻿.view-3d-container {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    border: solid 2px;
+    border-color: rgba(70, 171, 254, 0.34);
+    z-index: 900;
+    bottom: 0;
+    right: 0;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+}
+
+.view-3d-container-oculto {
+    display: none;
+}
+
+#view-3d {
+    width: 100%;
+    height: 100%;
+}
+
+.nivel-container {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+.nivel-seletor {
+    width: 21px;
+    height: 21px;
+    font-family: Poppins;
+    border-radius: 20px;
+    border: 1px solid;
+    border-color: rgba(70, 171, 254, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    color: #46ABFE;
+    font-weight: 600;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+}
+
+.nivel-seletor-ativo {
+    background: #46ABFE;
+    color: #fff;
+}
