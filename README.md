@@ -19,3 +19,5 @@ alocado. Por ser adaptável a qualquer galpão, independente de suas dimensões,
 recursos de edição geográfica do armazém também foram disponibilizados. Como
 funcionalidade adicional, há recursos de acesso à informação, aprimorando-se a
 transparência.
+
+![alt text](https://github.com/FilipeDuart/GestaoDeEstoque3D/blob/main/Monografia/tela%20inicial.png)
