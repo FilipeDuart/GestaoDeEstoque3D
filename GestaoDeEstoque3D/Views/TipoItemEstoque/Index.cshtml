@@ -1,0 +1,67 @@
+﻿@using GestaoDeEstoque3D.Dapper.Core
+
+@{
+    ViewBag.Title = "Tipo de Item de Estoque";
+
+    ViewBag.Versao = new SistemaConfiguracaoCore().RetornarPorNome("versao").Valor;
+}
+
+<head>
+    <link type="text/css" rel="stylesheet" href="~/Libraries/tabulator/tabulator.min.css?v=@ViewBag.Versao">
+    <link type="text/css" rel="stylesheet" href="~/Content/Planta2D/Planta.css?v=@ViewBag.Versao">
+    
+    <style>
+        body {
+            margin: 8px;
+        }
+    </style>
+</head>
+
+<h2>Tipo de Item de Estoque - Gestão de Estoque 3D</h2>
+
+<h3>Cadastro de Tipo de Item de Estoque</h3>
+
+<label id="codigo-label" style="display:none">Código do Tipo de Item de Estoque:</label>
+<input type="text" id="codigo" disabled style="display:none">
+<br>
+<label>Nome:</label>
+<input type="text" id="nome">
+<br>
+<label>Descrição:</label>
+<input type="text" id="descricao">
+<br>
+<label>Código de Barras:</label>
+<input type="text" id="codigo-de-barras">
+<br>
+<label>Largura (m)</label>
+<input type="text" id="largura">
+<br>
+<label>Altura (m)</label>
+<input type="text" id="altura">
+<br>
+<label>Profundidade (m)</label>
+<input type="text" id="profundidade">
+<br>
+<label>Peso (kg)</label>
+<input type="text" id="peso">
+<br>
+<label>Peso Máximo p/ Empilhamento (kg)</label>
+<input type="text" id="peso-empilhamento">
+<br>
+<br>
+<button id="button-adicionar" onclick="Cadastrar()">Adicionar</button>
+<button id="button-editar" onclick="Editar()" style="display:none">Editar</button>
+<button id="button-cancelar" onclick="CancelarEdicao()" style="display:none">Cancelar</button>
+<br>
+<br>
+
+<hr>
+
+<h3>Lista de Tipo de Item de Estoque</h3>
+
+<div class="container-tabela">
+    <div id="tabela"></div>
+</div>
+
+<script src="~/Libraries/tabulator/tabulator.min.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/TipoItemEstoque/cadastro.js?v=@ViewBag.Versao"></script>

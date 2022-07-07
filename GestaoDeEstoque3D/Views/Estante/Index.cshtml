@@ -1,0 +1,58 @@
+﻿@using GestaoDeEstoque3D.Dapper.Core
+
+@{
+    ViewBag.Title = "Estantes";
+
+    ViewBag.Versao = new SistemaConfiguracaoCore().RetornarPorNome("versao").Valor;
+}
+
+<head>
+    <link type="text/css" rel="stylesheet" href="~/Libraries/tabulator/tabulator.min.css?v=@ViewBag.Versao">
+    <link type="text/css" rel="stylesheet" href="~/Content/Planta2D/Planta.css?v=@ViewBag.Versao">
+
+    <style>
+        body {
+            margin: 8px;
+        }
+    </style>
+</head>
+
+<h2>Estantes - Gestão de Estoque 3D</h2>
+
+<h3>Cadastro de Estante</h3>
+
+<label id="estante-codigo-label" style="display:none">Código da Estante:</label>
+<input type="text" id="estante-codigo" disabled style="display:none">
+<br>
+<label>Quantidade de Prateleiras:</label>
+<input type="text" id="estante-quantidade-prateleiras">
+<br>
+<label>Largura das Prateleiras (m)</label>
+<input type="text" id="estante-largura-prateleiras">
+<br>
+<label>Altura das Prateleiras (m)</label>
+<input type="text" id="estante-altura-prateleiras">
+<br>
+<label>Profundidade das Prateleiras (m)</label>
+<input type="text" id="estante-profundidade-prateleiras">
+<br>
+<label>Peso Máximo das Prateleiras (kg)</label>
+<input type="text" id="estante-peso-maximo-prateleiras">
+<br>
+<br>
+<button id="button-adicionar-estante" onclick="CadastrarEstante()">Adicionar Estante</button>
+<button id="button-editar-estante" onclick="EditarEstante()" style="display:none">Editar Estante</button>
+<button id="button-cancelar" onclick="CancelarEdicao()" style="display:none">Cancelar</button>
+<br>
+<br>
+
+<hr>
+
+<h3>Lista de Estantes</h3>
+
+<div class="container-tabela">
+    <div id="tabela-estantes"></div>
+</div>
+
+<script src="~/Libraries/tabulator/tabulator.min.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Estante/cadastro-estantes.js?v=@ViewBag.Versao"></script>

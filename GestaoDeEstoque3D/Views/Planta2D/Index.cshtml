@@ -1,0 +1,406 @@
+﻿@using GestaoDeEstoque3D.Dapper.Core
+
+@{
+    ViewBag.Title = "Armazém 3D";
+
+    ViewBag.Versao = new SistemaConfiguracaoCore().RetornarPorNome("versao").Valor;
+}
+
+<head>
+    <link type="text/css" rel="stylesheet" href="~/Libraries/tabulator/tabulator.min.css?v=@ViewBag.Versao">
+
+    <link type="text/css" rel="stylesheet" href="~/Libraries/leaflet/leaflet.css?v=@ViewBag.Versao">
+    <link type="text/css" rel="stylesheet" href="~/Libraries/leaflet-geoman/leaflet-geoman.css?v=@ViewBag.Versao">
+
+    <link type="text/css" rel="stylesheet" href="~/Content/Planta2D/Planta.css?v=@ViewBag.Versao">
+    <link type="text/css" rel="stylesheet" href="~/Content/Planta2D/View3D.css?v=@ViewBag.Versao">
+    <link type="text/css" rel="stylesheet" href="~/Content/Planta2D/toolbar.css?v=@ViewBag.Versao">
+
+    <script src="https://kit.fontawesome.com/083c25095f.js" crossorigin="anonymous"></script>
+</head>
+
+<div class="page-container">
+    <div class="header">
+        <label>Armazém 3D</label>
+    </div>
+    <div class="conteudo-container">
+        <div id="planta"></div>
+
+        <div id="modal-container" class="modal-container" style="display: none">
+            <div class="item-botao item-botao-deletar modal-close" onclick="ModalLista.Fechar()">
+                <img src="/Content/Icones/close.svg" width="24" height="24">
+            </div>
+            <div class="modal-inner-container">
+                <div class="modal-lista-header">
+                    <input id="modal-pesquisa" type="text" class="modal-input" oninput="ModalLista.Filtrar()" />
+                    <button id="modal-button-relatorio-inventario" class="modal-button" onclick="window.open('/Relatorio/GerarRelatorioCompleto?excel=true', '_blank')" style="display: none; margin-right: calc(-100% + 875px);">Relatório de Inventário</button>
+                    <button id="modal-button-cadastrar-estante" class="modal-button" onclick="CadEstante.Abrir()" style="display: none">+ Cadastrar Estante</button>
+                    <button id="modal-button-nao-estocados" class="modal-button" onclick="CadItem.NaoEstocados.Abrir()" style="display: none; margin-right: calc(-100% + 875px);">Itens não estocados</button>
+                    <button id="modal-button-cadastrar-item" class="modal-button" onclick="CadItem.Abrir()" style="display: none">+ Cadastrar Item</button>
+                </div>
+                <div id="modal-lista-corpo" class="modal-lista-corpo"></div>
+            </div>
+        </div>
+
+        <div class="acoes-crud-container">
+            <div id="estantes-button" class="acoes-crud" style="width: 120px" onclick="ModalLista.Estantes.Abrir()"><img src="~/Content/Icones/menu.svg" width="24" height="24">Estantes</div>
+            <div id="itens-de-estoque-button" class="acoes-crud" style="width: 184px" onclick="ModalLista.ItensDeEstoque.Abrir()"><img src="~/Content/Icones/inbox.svg" width="24" height="24">Itens de Estoque</div>
+        </div>
+
+        @*MODAL DE ITENS NÃO ESTOCADOS*@
+        <div id="modal-nao-estocados" class="modal-container" style="display: none">
+            <div class="item-botao item-botao-deletar modal-close" onclick="CadItem.NaoEstocados.Fechar()">
+                <img src="/Content/Icones/close.svg" width="24" height="24">
+            </div>
+            <div class="modal-inner-container">
+                <div class="modal-lista-header">
+                    <input id="modal-pesquisa-nao-estocados" type="text" class="modal-input" oninput="CadItem.NaoEstocados.Filtrar()" />
+                </div>
+                <div id="modal-lista-nao-estocados-corpo" class="modal-lista-corpo"></div>
+            </div>
+        </div>
+
+        @*MODAL DE DELETAR ITENS NÃO ESTOCADOS*@
+        <div id="modal-deletar-item-nao-estocado" class="modal-container modal-cadastro-container" style="display: none; z-index: 1200;">
+            <div class="modal-cadastro-inner-container">
+                <div class="modal-cadastro-header">
+                    <span>Deletar Item de Estoque</span>
+                </div>
+                <div class="modal-cadastro-corpo">
+                    <div>
+                        <span>
+                            Tem certeza que deseja deletar este item de estoque?
+                        </span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="modal-cadastro-footer">
+                    <div class="item-botao" onclick="CadItem.NaoEstocados.DeletarItem.Finalizar()">
+                        <img src="/Content/Icones/checkmark.svg" width="24" height="24">
+                    </div>
+                    <div class="item-botao item-botao-deletar" onclick="CadItem.NaoEstocados.DeletarItem.Fechar()">
+                        <img src="/Content/Icones/close.svg" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*MODAL DE ITENS ASSOCIADOS NA ESTANTE*@
+        <div id="modal-associados-estante" class="modal-container" style="display: none">
+            <div class="item-botao item-botao-deletar modal-close" onclick="AssociadosEstante.Fechar()">
+                <img src="/Content/Icones/close.svg" width="24" height="24">
+            </div>
+            <div class="modal-inner-container">
+                <div class="modal-lista-header">
+                    <input id="modal-pesquisa-associados" type="text" class="modal-input" oninput="AssociadosEstante.Filtrar()" />
+                </div>
+                <div id="modal-lista-associados-corpo" class="modal-lista-corpo"></div>
+            </div>
+        </div>
+
+        @*MODAL DE CADASTRO DE ESTANTES*@
+        <div id="modal-cadastro-estante" class="modal-container modal-cadastro-container" style="display: none">
+            <div class="modal-cadastro-inner-container">
+                <div class="modal-cadastro-header">
+                    <span id="cad-estante-header">Cadastrar Estante</span>
+                    <span id="edit-estante-header">Editar Estante</span>
+                </div>
+                <div class="modal-cadastro-corpo">
+                    <input id="cad-estante-id" type="text" style="display: none" />
+                    <div>
+                        <span>
+                            Quantidade
+                            de Pratileiras
+                        </span>
+                        <span><input id="cad-estante-quant-prateleiras" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <div id="aviso-edit-estante">
+                        <span>
+                            Ao diminuir a quant. de prateleiras, qualquer item estocado irá para a seção de itens não estocados.
+                        </span>
+                        <span></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Largura (m)
+                        </span>
+                        <span><input id="cad-estante-largura" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Altura (m)
+                        </span>
+                        <span><input id="cad-estante-altura" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Profundidade (m)
+                        </span>
+                        <span><input id="cad-estante-profundidade" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Peso Máximo (kg)
+                        </span>
+                        <span><input id="cad-estante-peso-maximo" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                </div>
+                <div class="modal-cadastro-footer">
+                    <div class="item-botao" onclick="CadEstante.Finalizar()">
+                        <img src="/Content/Icones/checkmark.svg" width="24" height="24">
+                    </div>
+                    <div class="item-botao item-botao-deletar" onclick="CadEstante.Fechar()">
+                        <img src="/Content/Icones/close.svg" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*MODAL DE DELETAR ESTANTE*@
+        <div id="modal-deletar-estante" class="modal-container modal-cadastro-container" style="display: none">
+            <div class="modal-cadastro-inner-container">
+                <div class="modal-cadastro-header">
+                    <span>Deletar Estante</span>
+                </div>
+                <div class="modal-cadastro-corpo">
+                    <input id="deletar-estante-id" type="text" style="display: none" />
+                    <div>
+                        <span>
+                            Tem certeza que deseja deletar esta estante? Qualquer item estocado irá para a seção de itens não estocados.
+                        </span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="modal-cadastro-footer">
+                    <div class="item-botao" onclick="CadEstante.Deletar.Finalizar()">
+                        <img src="/Content/Icones/checkmark.svg" width="24" height="24">
+                    </div>
+                    <div class="item-botao item-botao-deletar" onclick="CadEstante.Deletar.Fechar()">
+                        <img src="/Content/Icones/close.svg" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*MODAL DE CADASTRO DE ITENS DE ESTOQUE*@
+        <div id="modal-cadastro-item" class="modal-container modal-cadastro-container" style="display: none">
+            <div class="modal-cadastro-inner-container">
+                <div class="modal-cadastro-header">
+                    <span id="cad-item-header">Cadastrar Item de Estoque</span>
+                    <span id="edit-item-header">Editar Item de Estoque</span>
+                </div>
+                <div class="modal-cadastro-corpo">
+                    <input id="cad-item-id" type="text" style="display: none" />
+                    <div>
+                        <span>
+                            Nome
+                        </span>
+                        <span><input id="cad-item-nome" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div style="display: none">
+                        <div>
+                            <span>
+                                Descrição
+                            </span>
+                            <span><input id="cad-item-descricao" type="text" class="modal-cadastro-input" /></span>
+                        </div>
+                        <hr>
+                    </div>
+                    <div>
+                        <span>
+                            Código de Barras
+                        </span>
+                        <span><input id="cad-item-codigo-barras" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Largura (m)
+                        </span>
+                        <span><input id="cad-item-largura" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Altura (m)
+                        </span>
+                        <span><input id="cad-item-altura" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Profundidade (m)
+                        </span>
+                        <span><input id="cad-item-profundidade" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Peso (kg)
+                        </span>
+                        <span><input id="cad-item-peso" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                    <hr>
+                    <div>
+                        <span>
+                            Peso Máximo p/ Empilhamento (kg)
+                        </span>
+                        <span><input id="cad-item-peso-maximo" type="text" class="modal-cadastro-input" /></span>
+                    </div>
+                </div>
+                <div class="modal-cadastro-footer">
+                    <div class="item-botao" onclick="CadItem.Finalizar()">
+                        <img src="/Content/Icones/checkmark.svg" width="24" height="24">
+                    </div>
+                    <div class="item-botao item-botao-deletar" onclick="CadItem.Fechar()">
+                        <img src="/Content/Icones/close.svg" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*MODAL DE DELETAR ITEM DE ESTOQUE*@
+        <div id="modal-deletar-item" class="modal-container modal-cadastro-container" style="display: none">
+            <div class="modal-cadastro-inner-container">
+                <div class="modal-cadastro-header">
+                    <span>Deletar Tipo de Item de Estoque</span>
+                </div>
+                <div class="modal-cadastro-corpo">
+                    <input id="deletar-item-id" type="text" style="display: none" />
+                    <div>
+                        <span>
+                            Tem certeza que deseja deletar este tipo de item de estoque?
+                        </span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="modal-cadastro-footer">
+                    <div class="item-botao" onclick="CadItem.Deletar.Finalizar()">
+                        <img src="/Content/Icones/checkmark.svg" width="24" height="24">
+                    </div>
+                    <div class="item-botao item-botao-deletar" onclick="CadItem.Deletar.Fechar()">
+                        <img src="/Content/Icones/close.svg" width="24" height="24">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="view-3d-container">
+    <div id="select-nivel-prateleira" class="nivel-container">
+        <div class="nivel-seletor nivel-seletor-ativo">
+            1
+        </div>
+    </div>
+    <div id="view-3d"></div>
+</div>
+
+<div id="snackbar-ancoragem" class="snackbar">
+    Na planta 2D, clique onde deve ser o ponto de ancoragem.
+    <button type="button" class="snackbar-button" onclick="Ancoragem.Finalizar()">Cancelar</button>
+</div>
+
+<div id="ModalNovoPoligono" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;">
+        <div class="modal-template-header">
+            <h2 class="modal-h2">Escolha a camada para criar o polígono</h2>
+        </div>
+        <div class="modal-template-body">
+            <select class="select-template" id="select-camada-novo-poligono"></select>
+            <button type="button" class="button-template" id="btnNovoPoligono">Criar</button>
+        </div>
+    </div>
+</div>
+
+<div id="ModalAdicionarReferencia" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;">
+        <div class="modal-template-header">
+            <h2 class="modal-h2">Código da estante</h2>
+        </div>
+        <div class="modal-template-body">
+            <input type="text" id="codigo-estante-input" class="select-template">
+            <button type="button" class="button-template" id="btnAdicionarReferencia">Adicionar referência</button>
+        </div>
+    </div>
+</div>
+
+<div id="ModalAdicionarEstante" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;padding: 5px 15px;">
+        <div class="modal-template-header">
+            <h2 class="modal-h2">Adicionar Estantes</h2>
+        </div>
+        <div class="modal-template-body">
+            <div id="tabela-adicionar-estante"></div>
+            <button type="button" class="button-template" id="btnAdicionarEstante">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div id="ModalItensDeEstoque" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;padding: 5px 15px;">
+        <div class="modal-template-header">
+            <h2 class="modal-h2">Itens de Estoque</h2>
+        </div>
+        <div class="modal-template-body">
+            <div id="tabela-adicionar-estante"></div>
+            <button type="button" class="button-template" onclick="ItensDeEstoque.AbrirModalEstocar();" style="margin-bottom: 5px">Estocar</button>
+            <button type="button" class="button-template" onclick="ItensDeEstoque.AbrirModalRetirar();" style="margin-bottom: 5px">Retirar</button>
+            @*<button type="button" class="button-template" style="margin-bottom: 5px">Lançar Perda</button>*@
+            <button type="button" class="button-template" onclick="$('#ModalItensDeEstoque').css('display', 'none')">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div id="ModaItensDeEstoque" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;padding: 5px 15px;">
+        <div class="modal-template-header">
+            <h2 id="ModaItensDeEstoque-Header" class="modal-h2">Itens de Estoque</h2>
+        </div>
+        <div class="modal-template-body">
+            <div id="tabela-modal-itens-de-estoque"></div>
+            <button type="button" class="button-template" onclick="$('#ModaItensDeEstoque').css('display', 'none')">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<div id="ModalRetirarItensDeEstoque" class="modal-template-container">
+    <div class="modal-template-inner-container" style="box-shadow: 0px 0px 20px 2px black;padding: 5px 15px;">
+        <div class="modal-template-header">
+            <h2 id="ModaItensDeEstoque-Header" class="modal-h2">Itens de Estoque - Retirar</h2>
+        </div>
+        <div class="modal-template-body">
+            <div id="tabela-modal-retirar-itens-de-estoque"></div>
+            <button type="button" class="button-template" onclick="$('#ModalRetirarItensDeEstoque').css('display', 'none')">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<script src="~/Libraries/tabulator/tabulator.min.js?v=@ViewBag.Versao"></script>
+
+<script src="~/Libraries/leaflet/leaflet.js?v=@ViewBag.Versao"></script>
+<script src="~/Libraries/leaflet-geoman/leaflet-geoman.min.js?v=@ViewBag.Versao"></script>
+<script src="~/Libraries/leaflet-label/leaflet.label.js?v=@ViewBag.Versao"></script>
+<script src="~/Libraries/three/three-min.js?v=@ViewBag.Versao"></script>
+<script src="~/Libraries/orbit-controls/orbit-controls.js?v=@ViewBag.Versao"></script>
+
+<script src="~/Scripts/Planta2D.Controls/toolbar.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D.Controls/adicionar-estante.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D.Controls/itens-de-estoque.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D/planta.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D/ItensDeEstoque.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/View3D/View3D.js?v=@ViewBag.Versao"></script>
+
+<script src="~/Scripts/bundle/main.js?v=@ViewBag.Versao"></script>
+
+<script src="~/Scripts/Planta2D/ModalLista.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D/CadEstante.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D/CadItem.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Planta2D/Ancoragem.js?v=@ViewBag.Versao"></script>
+<script src="~/Scripts/Estante/associados-estante.js?v=@ViewBag.Versao"></script>
