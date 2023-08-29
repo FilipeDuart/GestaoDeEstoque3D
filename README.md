@@ -21,3 +21,5 @@ funcionalidade adicional, há recursos de acesso à informação, aprimorando-se
 transparência.
 
 ![alt text](https://github.com/FilipeDuart/GestaoDeEstoque3D/blob/main/Monografia/tela%20inicial.png)
+
+Funcionalidades representadas no video: https://www.youtube.com/watch?v=dmG9Xk90UZU&t=303s
